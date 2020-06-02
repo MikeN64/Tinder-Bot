@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 import random
 import re
+import requests
 import config
 import messages
 
