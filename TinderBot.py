@@ -1,10 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
+from PIL import Image
 import time
 import random
 import re
 import requests
+import urllib.request
 import config
 import messages
 
@@ -120,15 +121,21 @@ class TinderBot():
         text_box.send_keys("Hiya! How's your quarantine going?")
 
 
-    def get_profile_pic_url(self):
+    def get_profile_pic(self):
+        file_name = "profile_pic.jpg"
         image_bg = self.driver.find_element_by_xpath("(//div[contains(@class, 'StretchedBox') and contains(@style,'background-image')])[last()]")
         style = image_bg.get_attribute("style")
-        url = re.search("https://.*\.webp", style).group(0)
+        match = re.search("https://.*\.(jpg|webp|png)", style)
+        
+        url = match.group(0)
         print(url)
+        im = Image.open(urllib.request.urlopen(url)).convert("RGB")
+        im.save(file_name, "jpeg")
+        return file_name
 
 
 if __name__ == "__main__":
     bot = TinderBot()
     bot.login()
     bot.goto_swipe()
-    bot.get_profile_pic_url()
+    profile_img = bot.get_profile_pic()
