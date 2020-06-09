@@ -94,9 +94,15 @@ class TinderBot():
         swipe_rate = config.SWIPE_RATE
         swipe_margin = config.SWIPE_RATE_MARGIN
 
-        try:
-            while True:
+        while True:
+            try:
                 self.get_profile_pic()
+                time.sleep(3)
+            except Exception as e:
+                print(e)
+                break
+
+            try:
                 like_chance = like_rate + random.uniform(-like_margin, like_margin)
                 seconds = swipe_rate + random.uniform(-swipe_margin, swipe_margin)
                 if random.random() <= like_chance:
@@ -104,25 +110,24 @@ class TinderBot():
                 else:
                     self.swipe_nope()
                 time.sleep(seconds)
-        except: 
-            print("Interrupted")
-            try:
-                self.send_match_message()
-                time.sleep(3)
-                self.auto_swipe()
-            except:
-                print("Not a match interrupted")
+            except Exception as e:
+                print(e)
                 try:
-                    self._click_btn("Not interested")
+                    self.send_match_message()
                     time.sleep(3)
-                    self.auto_swipe()
-                except:
-                    print("Not a 'Not Interested' Interruption")
-
+                except Exception as e:
+                    print(e)
+                    try:
+                        self._click_btn("Not interested")
+                        time.sleep(3)
+                    except Exception as e:
+                        print(e)
+                        break
+                        
 
     def send_match_message(self):
         text_box = self.driver.find_element_by_xpath('//textarea[@placeholder="Say something nice!"]')
-        text_box.send_keys("Hiya! How's your quarantine going?")
+        text_box.send_keys("Bonjour! How's your summer going for ya?")
         text_box.send_keys(Keys.RETURN)
 
     def get_profile_pic(self):
@@ -132,12 +137,12 @@ class TinderBot():
         ext = ".jpg"
         file_name = image_dir + name + ext
 
-        image_bg = self.driver.find_element_by_xpath("(//div[contains(@class, 'StretchedBox') and contains(@style,'background-image')])[last()]")
+        image_bg = self.driver.find_element_by_xpath("(//div[contains(@class, 'StretchedBox') and contains(@style,'background-image: url')])[last()]")
         style = image_bg.get_attribute("style")
+        print(style)
         match = re.search("https://.*\.(jpg|webp|png)", style)
         
         url = match.group(0)
-        print(url)
         im = Image.open(urllib.request.urlopen(url)).convert("RGB")
         im.save(file_name, "jpeg")
         return file_name
