@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from PIL import Image
+from functools import reduce
+from datetime import datetime
 import time
 import random
 import re
@@ -122,7 +124,11 @@ class TinderBot():
 
 
     def get_profile_pic(self):
-        file_name = "profile_pic.jpg"
+        now = datetime.now()
+        name = reduce(lambda x, y: str(x) + str(y), [now.day, now.month, now.year, now.hour, now.minute, now.second])
+        ext = ".jpg"
+        file_name = name + ext
+
         image_bg = self.driver.find_element_by_xpath("(//div[contains(@class, 'StretchedBox') and contains(@style,'background-image')])[last()]")
         style = image_bg.get_attribute("style")
         match = re.search("https://.*\.(jpg|webp|png)", style)
