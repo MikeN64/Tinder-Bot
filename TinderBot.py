@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from PIL import Image
 from functools import reduce
 from datetime import datetime
+import os
 import time
 import random
 import re
@@ -95,6 +96,7 @@ class TinderBot():
 
         try:
             while True:
+                self.get_profile_pic()
                 like_chance = like_rate + random.uniform(-like_margin, like_margin)
                 seconds = swipe_rate + random.uniform(-swipe_margin, swipe_margin)
                 if random.random() <= like_chance:
@@ -121,13 +123,14 @@ class TinderBot():
     def send_match_message(self):
         text_box = self.driver.find_element_by_xpath('//textarea[@placeholder="Say something nice!"]')
         text_box.send_keys("Hiya! How's your quarantine going?")
-
+        text_box.send_keys(Keys.RETURN)
 
     def get_profile_pic(self):
         now = datetime.now()
+        image_dir = os.getcwd() + "/images/"
         name = reduce(lambda x, y: str(x) + str(y), [now.day, now.month, now.year, now.hour, now.minute, now.second])
         ext = ".jpg"
-        file_name = name + ext
+        file_name = image_dir + name + ext
 
         image_bg = self.driver.find_element_by_xpath("(//div[contains(@class, 'StretchedBox') and contains(@style,'background-image')])[last()]")
         style = image_bg.get_attribute("style")
@@ -144,4 +147,4 @@ if __name__ == "__main__":
     bot = TinderBot()
     bot.login()
     bot.goto_swipe()
-    profile_img = bot.get_profile_pic()
+    bot.auto_swipe()
